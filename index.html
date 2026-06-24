@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOB Autowas - Rooster</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>BOB Autowas - Rooster</h1>
+        <nav>
+            <button class="nav-btn active" data-tab="rooster">Rooster</button>
+            <button class="nav-btn" data-tab="medewerkers">Medewerkers</button>
+            <button class="nav-btn" data-tab="beschikbaarheid">Beschikbaarheid</button>
+            <button class="nav-btn" data-tab="verlof">Verlof</button>
+            <button class="nav-btn" data-tab="instellingen">Instellingen</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- ROOSTER TAB -->
+        <section id="tab-rooster" class="tab-content active">
+            <div class="rooster-header">
+                <button id="prev-week" class="btn-icon">◀</button>
+                <h2 id="week-label">Week 1 - 2026</h2>
+                <button id="next-week" class="btn-icon">▶</button>
+                <button id="generate-btn" class="btn-primary">Rooster Genereren</button>
+            </div>
+            <div id="rooster-grid" class="rooster-grid"></div>
+            <div id="rooster-stats" class="rooster-stats"></div>
+        </section>
+
+        <!-- MEDEWERKERS TAB -->
+        <section id="tab-medewerkers" class="tab-content">
+            <h2>Medewerkers</h2>
+            <form id="add-employee-form" class="form-row">
+                <input type="text" id="emp-name" placeholder="Naam" required>
+                <input type="number" id="emp-max-hours" placeholder="Max uren/week" min="1" max="60" required>
+                <select id="emp-contract">
+                    <option value="vast">Vast contract</option>
+                    <option value="0uren">0-uren contract</option>
+                </select>
+                <input type="text" id="emp-role" placeholder="Rol (optioneel)">
+                <button type="submit" class="btn-primary">Toevoegen</button>
+            </form>
+            <div id="employee-list" class="employee-list"></div>
+        </section>
+
+        <!-- BESCHIKBAARHEID TAB -->
+        <section id="tab-beschikbaarheid" class="tab-content">
+            <h2>Beschikbaarheid</h2>
+            <div class="avail-controls">
+                <select id="avail-employee"></select>
+            </div>
+            <div id="availability-grid" class="availability-grid"></div>
+            <button id="save-availability" class="btn-primary">Opslaan</button>
+            <button id="reset-availability" class="btn-danger" style="margin-left:0.5rem;">Reset deze medewerker</button>
+            <button id="reset-all-availability" class="btn-danger" style="margin-left:0.5rem;">Reset alle beschikbaarheid</button>
+        </section>
+
+        <!-- VERLOF TAB -->
+        <section id="tab-verlof" class="tab-content">
+            <h2>Verlof & Vrije Dagen</h2>
+            <form id="add-leave-form" class="form-row">
+                <select id="leave-employee"></select>
+                <input type="date" id="leave-start" required>
+                <input type="date" id="leave-end" required>
+                <input type="text" id="leave-reason" placeholder="Reden (optioneel)">
+                <button type="submit" class="btn-primary">Toevoegen</button>
+            </form>
+            <div id="leave-list" class="leave-list"></div>
+        </section>
+
+        <!-- INSTELLINGEN TAB -->
+        <section id="tab-instellingen" class="tab-content">
+            <h2>Instellingen</h2>
+            <div class="settings-grid">
+                <div class="setting-group">
+                    <h3>Openingstijden</h3>
+                    <p class="setting-info">Ma-Za: 08:00 - 20:00 | Zo: 10:00 - 20:00</p>
+                    <p class="setting-info">Ochtend opener: 30 min eerder | Sluiters: 30 min langer</p>
+                </div>
+                <div class="setting-group">
+                    <h3>Minimale bezetting</h3>
+                    <label>Ochtend minimaal: <input type="number" id="set-min-morning" value="2" min="1" max="10"></label>
+                    <label>Sluiting minimaal: <input type="number" id="set-min-closing" value="2" min="1" max="10"></label>
+                </div>
+                <div class="setting-group">
+                    <h3>Speciale diensten</h3>
+                    <label><input type="checkbox" id="set-monday-clean" checked> Maandag schoonmaakdienst (na 20:00)</label>
+                    <label>Minimaal schoonmakers maandag: <input type="number" id="set-monday-clean-min" value="2" min="1" max="10"></label>
+                    <label><input type="checkbox" id="set-wednesday-maint" checked> Woensdag onderhoud + schoonmaak</label>
+                    <label>Minimaal techniek woensdag: <input type="number" id="set-wed-tech-min" value="1" min="1" max="10"></label>
+                    <label>Minimaal schoonmaak woensdag: <input type="number" id="set-wed-clean-min" value="1" min="1" max="10"></label>
+                </div>
+                <div class="setting-group">
+                    <h3>Pauze</h3>
+                    <label>Pauze (minuten): <input type="number" id="set-break" value="30" min="0" max="60"></label>
+                </div>
+                <button id="save-settings" class="btn-primary">Instellingen Opslaan</button>
+                <button id="export-data" class="btn-secondary">Exporteer Data (JSON)</button>
+                <button id="import-data" class="btn-secondary">Importeer Data</button>
+                <input type="file" id="import-file" accept=".json" style="display:none">
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
