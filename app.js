@@ -34,7 +34,7 @@ async function syncToCloud() {
     clearTimeout(_saveTimeout);
     _saveTimeout = setTimeout(async () => {
         try {
-            const data = { employees, availability, leaves, schedules, settings };
+            const data = { employees, availability, leaves, schedules, settings, kassaTransactions };
             await fetch(WORKER_URL + '/data', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -54,7 +54,9 @@ async function loadFromCloud() {
             leaves = data.leaves || [];
             schedules = data.schedules || {};
             settings = data.settings || settings;
+            if (data.kassaTransactions) kassaTransactions = data.kassaTransactions;
             save();
+            renderKassa();
             renderEmployees();
             updateEmployeeSelects();
             loadSettings();
@@ -89,6 +91,7 @@ function save() {
     Store.set('leaves', leaves);
     Store.set('schedules', schedules);
     Store.set('settings', settings);
+    Store.set('kassaTransactions', kassaTransactions);
     syncToCloud();
 }
 
@@ -169,6 +172,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.add('active');
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
 
+        if (btn.dataset.tab === 'kassa') renderKassa();
         if (btn.dataset.tab === 'beschikbaarheid') renderAvailability();
         if (btn.dataset.tab === 'verlof') renderLeaves();
         if (btn.dataset.tab === 'rooster') renderRooster();
@@ -956,7 +960,7 @@ function loadSettings() {
 
 // ============ EXPORT / IMPORT ============
 document.getElementById('export-data').addEventListener('click', () => {
-    const data = { employees, availability, leaves, schedules, settings };
+    const data = { employees, availability, leaves, schedules, settings, kassaTransactions };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -983,7 +987,9 @@ document.getElementById('import-file').addEventListener('change', e => {
             if (data.leaves) leaves = data.leaves;
             if (data.schedules) schedules = data.schedules;
             if (data.settings) settings = data.settings;
+            if (data.kassaTransactions) kassaTransactions = data.kassaTransactions;
             save();
+            renderKassa();
             renderEmployees();
             updateEmployeeSelects();
             loadSettings();
@@ -996,7 +1002,203 @@ document.getElementById('import-file').addEventListener('change', e => {
     reader.readAsText(file);
 });
 
+// ============ KASSA ============
+let kassaTransactions = Store.get('kassaTransactions', {});
+let kassaDayOffset = 0;
+
+const PROGRAMS = [
+    { id: 'normaal', name: 'Normaal' },
+    { id: 'intensief', name: 'Intensief' },
+    { id: 'proteqt', name: 'Proteqt' }
+];
+
+function getKassaDate(offset) {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + offset);
+    return d;
+}
+
+function getKassaDateKey(offset) {
+    return formatDate(getKassaDate(offset));
+}
+
+function getKassaDayTransactions(offset) {
+    const key = getKassaDateKey(offset);
+    return kassaTransactions[key] || [];
+}
+
+function addKassaTransaction(program) {
+    const key = getKassaDateKey(kassaDayOffset);
+    if (!kassaTransactions[key]) kassaTransactions[key] = [];
+    kassaTransactions[key].push({
+        id: generateId(),
+        program: program,
+        time: new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
+    });
+    Store.set('kassaTransactions', kassaTransactions);
+    syncToCloud();
+    renderKassa();
+}
+
+function removeKassaTransaction(id) {
+    const key = getKassaDateKey(kassaDayOffset);
+    if (!kassaTransactions[key]) return;
+    kassaTransactions[key] = kassaTransactions[key].filter(t => t.id !== id);
+    if (kassaTransactions[key].length === 0) delete kassaTransactions[key];
+    Store.set('kassaTransactions', kassaTransactions);
+    syncToCloud();
+    renderKassa();
+}
+
+function clearKassaDay() {
+    const key = getKassaDateKey(kassaDayOffset);
+    const date = getKassaDate(kassaDayOffset);
+    const label = kassaDayOffset === 0 ? 'vandaag' : formatDateNL(date);
+    if (!confirm(`Alle registraties van ${label} wissen?`)) return;
+    delete kassaTransactions[key];
+    Store.set('kassaTransactions', kassaTransactions);
+    syncToCloud();
+    renderKassa();
+    toast('Dag gewist');
+}
+
+function formatDateNL(d) {
+    const days = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
+    const months = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+    return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function renderKassa() {
+    const date = getKassaDate(kassaDayOffset);
+    const transactions = getKassaDayTransactions(kassaDayOffset);
+
+    const dateLabel = document.getElementById('kassa-date-label');
+    if (kassaDayOffset === 0) {
+        dateLabel.textContent = `Vandaag - ${formatDateNL(date)}`;
+    } else if (kassaDayOffset === -1) {
+        dateLabel.textContent = `Gisteren - ${formatDateNL(date)}`;
+    } else {
+        dateLabel.textContent = formatDateNL(date);
+    }
+
+    const total = transactions.length;
+    const counts = { normaal: 0, intensief: 0, proteqt: 0 };
+    transactions.forEach(t => { counts[t.program] = (counts[t.program] || 0) + 1; });
+
+    document.getElementById('kassa-total-count').textContent = total;
+    document.getElementById('count-normaal').textContent = counts.normaal;
+    document.getElementById('count-intensief').textContent = counts.intensief;
+    document.getElementById('count-proteqt').textContent = counts.proteqt;
+
+    renderKassaBarChart(counts, total);
+    renderKassaWeekGrid();
+    renderKassaTransactions(transactions);
+}
+
+function renderKassaBarChart(counts, total) {
+    const chart = document.getElementById('kassa-bar-chart');
+    const maxCount = Math.max(counts.normaal, counts.intensief, counts.proteqt, 1);
+
+    chart.innerHTML = PROGRAMS.map(p => {
+        const count = counts[p.id] || 0;
+        const pct = (count / maxCount) * 100;
+        const height = Math.max(pct, 4);
+        return `
+            <div class="kassa-bar-wrapper">
+                <div class="kassa-bar bar-${p.id}" style="height: ${height}%">
+                    <span class="kassa-bar-value">${count}</span>
+                </div>
+                <span class="kassa-bar-label">${p.name}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderKassaWeekGrid() {
+    const grid = document.getElementById('kassa-week-grid');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const jsDay = today.getDay();
+    const mondayOffset = jsDay === 0 ? -6 : 1 - jsDay;
+
+    const dayNames = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
+    let html = '';
+
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + mondayOffset + i);
+        const key = formatDate(d);
+        const dayTransactions = kassaTransactions[key] || [];
+        const count = dayTransactions.length;
+        const isToday = formatDate(d) === formatDate(today);
+
+        html += `
+            <div class="kassa-week-day ${isToday ? 'today' : ''}">
+                <div class="week-day-name">${dayNames[i]}</div>
+                <div class="week-day-count">${count}</div>
+                <div class="week-day-date">${d.getDate()}/${d.getMonth() + 1}</div>
+            </div>
+        `;
+    }
+
+    grid.innerHTML = html;
+}
+
+function renderKassaTransactions(transactions) {
+    const list = document.getElementById('kassa-transaction-list');
+
+    if (transactions.length === 0) {
+        list.innerHTML = '<p style="color:#999;padding:1rem;text-align:center;">Nog geen registraties voor deze dag.</p>';
+        return;
+    }
+
+    const reversed = [...transactions].reverse();
+    list.innerHTML = reversed.map(t => {
+        const prog = PROGRAMS.find(p => p.id === t.program);
+        return `
+            <div class="kassa-transaction">
+                <span class="transaction-dot dot-${t.program}"></span>
+                <span class="transaction-program">${prog ? prog.name : t.program}</span>
+                <span class="transaction-time">${t.time}</span>
+                <button class="transaction-delete" data-id="${t.id}" title="Verwijderen">&times;</button>
+            </div>
+        `;
+    }).join('');
+}
+
+document.querySelectorAll('.kassa-add-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        addKassaTransaction(btn.dataset.program);
+        toast(`${btn.dataset.program.charAt(0).toUpperCase() + btn.dataset.program.slice(1)} +1`);
+    });
+});
+
+document.getElementById('kassa-transaction-list').addEventListener('click', e => {
+    const btn = e.target.closest('.transaction-delete');
+    if (!btn) return;
+    removeKassaTransaction(btn.dataset.id);
+});
+
+document.getElementById('kassa-prev-day').addEventListener('click', () => {
+    kassaDayOffset--;
+    renderKassa();
+});
+
+document.getElementById('kassa-next-day').addEventListener('click', () => {
+    kassaDayOffset++;
+    renderKassa();
+});
+
+document.getElementById('kassa-today-btn').addEventListener('click', () => {
+    kassaDayOffset = 0;
+    renderKassa();
+});
+
+document.getElementById('kassa-clear-day').addEventListener('click', clearKassaDay);
+
 // ============ INIT ============
+renderKassa();
 renderEmployees();
 updateEmployeeSelects();
 loadSettings();

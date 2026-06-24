@@ -603,6 +603,372 @@ h3 {
     transform: translateY(0);
 }
 
+/* ============ KASSA ============ */
+.kassa-date-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.kassa-date-nav h2 {
+    margin-bottom: 0;
+    min-width: 220px;
+    text-align: center;
+}
+
+.kassa-dashboard {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.kassa-total-card {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.kassa-total-number {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff, #ccc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.kassa-total-label {
+    font-size: 0.95rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.kassa-program-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.kassa-program-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-left: 5px solid transparent;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.kassa-program-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.program-normaal {
+    border-left-color: #3498db;
+}
+
+.program-intensief {
+    border-left-color: #CC0000;
+}
+
+.program-proteqt {
+    border-left-color: #f39c12;
+}
+
+.program-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+}
+
+.program-normaal .program-icon {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.program-intensief .program-icon {
+    background: linear-gradient(135deg, #CC0000, #aa0000);
+}
+
+.program-proteqt .program-icon {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+.program-info {
+    flex: 1;
+}
+
+.program-name {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.program-count {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    line-height: 1.1;
+}
+
+.kassa-add-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    border: none;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.15s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.kassa-add-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.kassa-add-btn:active {
+    transform: scale(0.95);
+}
+
+.program-normaal .kassa-add-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.program-intensief .kassa-add-btn {
+    background: linear-gradient(135deg, #CC0000, #aa0000);
+}
+
+.program-proteqt .kassa-add-btn {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+.kassa-chart-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.kassa-chart-section h3 {
+    margin-bottom: 1rem;
+    color: #1a1a1a;
+}
+
+.kassa-bar-chart {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+    height: 120px;
+    padding: 0.5rem 0;
+}
+
+.kassa-bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.kassa-bar {
+    width: 100%;
+    max-width: 80px;
+    border-radius: 8px 8px 0 0;
+    min-height: 4px;
+    transition: height 0.4s ease;
+    position: relative;
+}
+
+.kassa-bar-value {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1a1a1a;
+}
+
+.kassa-bar-label {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 600;
+}
+
+.bar-normaal { background: linear-gradient(to top, #3498db, #5dade2); }
+.bar-intensief { background: linear-gradient(to top, #CC0000, #e74c3c); }
+.bar-proteqt { background: linear-gradient(to top, #f39c12, #f5b041); }
+
+.kassa-week-overview {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.kassa-week-overview h3 {
+    margin-bottom: 1rem;
+    color: #1a1a1a;
+}
+
+.kassa-week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.kassa-week-day {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    transition: transform 0.1s;
+}
+
+.kassa-week-day.today {
+    background: #1a1a1a;
+    color: white;
+}
+
+.kassa-week-day.today .week-day-count {
+    color: white;
+}
+
+.kassa-week-day.today .week-day-name {
+    color: rgba(255,255,255,0.7);
+}
+
+.week-day-name {
+    font-size: 0.75rem;
+    color: #999;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.week-day-count {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #1a1a1a;
+}
+
+.week-day-date {
+    font-size: 0.7rem;
+    color: #bbb;
+    margin-top: 0.15rem;
+}
+
+.kassa-history {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.kassa-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.kassa-history-header h3 {
+    color: #1a1a1a;
+    margin-bottom: 0;
+}
+
+.kassa-transaction-list {
+    display: grid;
+    gap: 0.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.kassa-transaction {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: background 0.15s;
+}
+
+.kassa-transaction:hover {
+    background: #f0f1f3;
+}
+
+.transaction-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dot-normaal { background: #3498db; }
+.dot-intensief { background: #CC0000; }
+.dot-proteqt { background: #f39c12; }
+
+.transaction-program {
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.transaction-time {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.transaction-delete {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.2rem;
+    transition: color 0.15s;
+    line-height: 1;
+}
+
+.transaction-delete:hover {
+    color: #dc3545;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     header {
@@ -621,5 +987,17 @@ h3 {
     .rooster-header {
         flex-direction: column;
         align-items: flex-start;
+    }
+    .kassa-dashboard {
+        grid-template-columns: 1fr;
+    }
+    .kassa-program-cards {
+        grid-template-columns: 1fr;
+    }
+    .kassa-week-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .kassa-date-nav {
+        justify-content: center;
     }
 }

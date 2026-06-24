@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOB Autowas - Rooster</title>
+    <title>BOB Autowas</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>BOB Autowas - Rooster</h1>
+        <h1>BOB Autowas</h1>
         <nav>
-            <button class="nav-btn active" data-tab="rooster">Rooster</button>
+            <button class="nav-btn active" data-tab="kassa">Kassa</button>
+            <button class="nav-btn" data-tab="rooster">Rooster</button>
             <button class="nav-btn" data-tab="medewerkers">Medewerkers</button>
             <button class="nav-btn" data-tab="beschikbaarheid">Beschikbaarheid</button>
             <button class="nav-btn" data-tab="verlof">Verlof</button>
@@ -19,8 +20,69 @@
     </header>
 
     <main>
+        <!-- KASSA TAB -->
+        <section id="tab-kassa" class="tab-content active">
+            <div class="kassa-date-nav">
+                <button id="kassa-prev-day" class="btn-icon">◀</button>
+                <h2 id="kassa-date-label">Vandaag</h2>
+                <button id="kassa-next-day" class="btn-icon">▶</button>
+                <button id="kassa-today-btn" class="btn-secondary">Vandaag</button>
+            </div>
+
+            <div class="kassa-dashboard">
+                <div class="kassa-total-card">
+                    <div class="kassa-total-number" id="kassa-total-count">0</div>
+                    <div class="kassa-total-label">auto's vandaag</div>
+                </div>
+                <div class="kassa-program-cards">
+                    <div class="kassa-program-card program-normaal">
+                        <div class="program-icon">1</div>
+                        <div class="program-info">
+                            <div class="program-name">Normaal</div>
+                            <div class="program-count" id="count-normaal">0</div>
+                        </div>
+                        <button class="kassa-add-btn" data-program="normaal">+</button>
+                    </div>
+                    <div class="kassa-program-card program-intensief">
+                        <div class="program-icon">2</div>
+                        <div class="program-info">
+                            <div class="program-name">Intensief</div>
+                            <div class="program-count" id="count-intensief">0</div>
+                        </div>
+                        <button class="kassa-add-btn" data-program="intensief">+</button>
+                    </div>
+                    <div class="kassa-program-card program-proteqt">
+                        <div class="program-icon">3</div>
+                        <div class="program-info">
+                            <div class="program-name">Proteqt</div>
+                            <div class="program-count" id="count-proteqt">0</div>
+                        </div>
+                        <button class="kassa-add-btn" data-program="proteqt">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kassa-chart-section">
+                <h3>Verdeling programma's</h3>
+                <div class="kassa-bar-chart" id="kassa-bar-chart"></div>
+            </div>
+
+            <div class="kassa-week-overview">
+                <h3>Weekoverzicht</h3>
+                <div class="kassa-week-grid" id="kassa-week-grid"></div>
+            </div>
+
+            <div class="kassa-history">
+                <div class="kassa-history-header">
+                    <h3>Registraties</h3>
+                    <button id="kassa-clear-day" class="btn-danger">Dag wissen</button>
+                </div>
+                <div id="kassa-transaction-list" class="kassa-transaction-list"></div>
+            </div>
+        </section>
+
         <!-- ROOSTER TAB -->
-        <section id="tab-rooster" class="tab-content active">
+        <section id="tab-rooster" class="tab-content">
             <div class="rooster-header">
                 <button id="prev-week" class="btn-icon">◀</button>
                 <h2 id="week-label">Week 1 - 2026</h2>
